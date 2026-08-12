@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.messages import constants
 from django.contrib import messages, auth
 from django.contrib.auth import authenticate
+from usuarios.models import Cliente
 
 def cadastro(request):
     if request.method == 'GET':
@@ -44,3 +45,24 @@ def login(request):
         else:
             messages.add_message(request, constants.ERROR, 'Usuário ou senha inválidos.')
             return redirect('login')
+
+def clientes(request):
+    if request.method == 'GET':
+        clientes = Cliente.objects.filter(user=request.user)
+        return render(request, 'clientes.html', {'clientes': clientes})
+    elif request.method == 'POST':
+        nome = request.POST.get('nome')
+        email = request.POST.get('email')
+        tipo = request.POST.get('tipo')
+        status = request.POST.get('status') == 'on'
+        
+        Cliente.objects.create(
+            nome=nome,
+            email=email,
+            tipo=tipo,
+            status=status,
+            user=request.user
+        )
+        
+        messages.add_message(request, constants.SUCCESS, 'Cliente cadastrado com sucesso!')
+        return redirect('clientes')
