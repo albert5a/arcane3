@@ -1,48 +1,49 @@
 # Changelog
 
-Todas as mudancas relevantes deste projeto serao documentadas neste arquivo.
+Todas as mudanças relevantes deste projeto serão documentadas neste arquivo.
 
-O formato segue a ideia de manter uma secao de trabalho atual e registrar entregas por versao quando o projeto passar a usar releases/tags.
+O formato mantém uma seção de trabalho atual e registrará entregas por versão quando o projeto passar a usar releases ou tags.
 
-## [Nao lancado]
+## [Não lançado]
 
 ### Adicionado
 
-- Estrutura inicial de projeto Django com modulo principal `core`.
-- Arquivo `manage.py` para comandos administrativos do Django.
-- Configuracao de URL principal em `core/urls.py`.
-- Rota do painel administrativo em `/admin/`.
-- App `usuarios` criado e registrado em `INSTALLED_APPS`.
-- Arquivo de rotas do app `usuarios`.
-- Rota `/usuarios/cadastro/` apontando para a view de cadastro.
-- View `cadastro` com suporte a requisicoes `GET` e `POST`.
-- Renderizacao do template de cadastro em requisicoes `GET`.
-- Resposta HTTP simples de sucesso apos envio `POST` do formulario.
-- Template global `templates/base.html` com carregamento de Tailwind CSS via CDN.
-- Tela de cadastro em `usuarios/templates/cadastro.html`.
-- Formulario visual com campos de username, senha e confirmacao de senha.
-- Botao principal de cadastro.
-- Link visual para usuario que ja possui conta.
-- Botoes visuais para continuidade com Google e GitHub.
-- Uso de logo e banner por meio do sistema de arquivos estaticos do Django.
-- Pasta `templates/static` com imagens da interface.
-- Configuracao de templates globais em `BASE_DIR / "templates"`.
-- Configuracao de arquivos estaticos com `STATICFILES_DIRS` e `STATIC_ROOT`.
-- Configuracao inicial de arquivos de media com `MEDIA_ROOT` e `MEDIA_URL`.
-- Banco SQLite local configurado em `db.sqlite3`.
-- Internacionalizacao configurada com `LANGUAGE_CODE = "pt-br"`.
+- Página inicial institucional da JURI.AI na rota `/`, com apresentação do produto e links para o cadastro.
+- Testes automatizados para validar a disponibilidade da home e seu link para a tela de cadastro.
+- Persistência de usuários por meio do sistema de autenticação do Django.
+- Validações no cadastro para confirmação da senha, tamanho mínimo de oito caracteres e username duplicado.
+- Mensagens visuais de sucesso e erro nas telas de cadastro e login.
+- Tela e fluxo de login com autenticação de credenciais e criação de sessão.
+- Modelo `Cliente` com nome, e-mail único, tipo de pessoa, status e vínculo com o usuário responsável.
+- Migração inicial do app `usuarios` para criação da tabela de clientes.
+- Registro do modelo `Cliente` no Django Admin.
+- Tela de clientes com listagem dos registros do usuário atual e formulário modal para novos cadastros.
+- Mensagem de confirmação após o cadastro de um cliente.
+- Estilos do framework de mensagens do Django configurados em `MESSAGE_TAGS`.
 
-### Estado atual conhecido
+### Alterado
 
-- O cadastro ainda nao persiste usuarios no banco de dados.
-- O app `usuarios` ainda nao possui modelos.
-- Os botoes de Google e GitHub ainda nao executam autenticacao social.
-- A view le `password`, enquanto o template envia `senha`; esse alinhamento ainda precisa ser corrigido.
-- Ainda nao ha testes automatizados alem do arquivo padrao `usuarios/tests.py`.
+- O cadastro deixou de retornar uma resposta HTTP demonstrativa e agora cria o usuário no banco de dados.
+- A tela de cadastro passou a exibir mensagens de validação e a direcionar usuários existentes para o login.
+- Usuários autenticados são redirecionados para a tela de clientes após o login.
+
+### Limitações conhecidas
+
+- A rota de clientes ainda não possui proteção explícita com `login_required`; acessos anônimos diretos podem resultar em erro.
+- Os indicadores, a busca e o filtro exibidos na tela de clientes ainda são apenas visuais.
+- O campo de e-mail de `Cliente` é único globalmente, inclusive entre usuários responsáveis diferentes.
+- Os botões de Google e GitHub ainda não executam autenticação social.
+- O fluxo de logout ainda não foi implementado.
+- A cobertura automatizada atual contempla somente a página inicial; cadastro, login e clientes ainda precisam de testes específicos.
 
 ## [0.1.0] - Estado inicial documentado
 
 ### Adicionado
 
-- Documentacao inicial do projeto em `README.md`.
-- Registro inicial do historico funcional em `CHANGELOG.md`.
+- Estrutura inicial do projeto Django com o módulo `core` e o app `usuarios`.
+- Painel administrativo padrão do Django em `/admin/`.
+- Primeira versão da rota, view e interface de cadastro de usuários.
+- Template base com Tailwind CSS via CDN.
+- Configuração de templates globais, arquivos estáticos, mídia e banco SQLite local.
+- Documentação inicial do projeto em `README.md`.
+- Registro inicial do histórico funcional em `CHANGELOG.md`.

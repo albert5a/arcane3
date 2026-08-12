@@ -1,26 +1,30 @@
 # Arcane3
 
-Aplicacao Django em desenvolvimento com uma primeira interface de cadastro de usuarios. O projeto esta organizado em torno do projeto Django `core` e do app `usuarios`.
+Aplicação Django em desenvolvimento para gestão jurídica, apresentada na interface como **JURI.AI**. O estado atual oferece uma página institucional, cadastro e login de usuários e uma área inicial para gestão de clientes.
 
-## Estado atual
+## Funcionalidades
 
-- Projeto Django criado com `manage.py` e configuracoes em `core/`.
-- App `usuarios` registrado em `INSTALLED_APPS`.
-- Rota administrativa padrao do Django em `/admin/`.
-- Rota de cadastro em `/usuarios/cadastro/`.
-- Template base global em `templates/base.html`.
-- Tela de cadastro em `usuarios/templates/cadastro.html`.
-- Arquivos estaticos em `templates/static/`.
-- Banco SQLite local configurado em `db.sqlite3`.
+- Página inicial institucional com chamada para criação de conta.
+- Cadastro persistido com o sistema de autenticação do Django.
+- Validação de confirmação de senha, mínimo de oito caracteres e username duplicado.
+- Login com criação de sessão e mensagens para credenciais inválidas.
+- Cadastro e listagem de clientes vinculados ao usuário atual.
+- Classificação de clientes como pessoa física (`PF`) ou jurídica (`PJ`) e como ativos ou inativos.
+- Administração de clientes pelo Django Admin.
+- Mensagens visuais de sucesso e erro.
+- Testes automatizados da página inicial.
+
+Os botões de Google e GitHub presentes nas telas são apenas elementos visuais; autenticação social ainda não está configurada.
 
 ## Stack principal
 
-- Python 3.12, conforme ambiente virtual local.
+- Python 3.12.
 - Django 6.0.1.
 - SQLite para desenvolvimento local.
-- Tailwind CSS carregado via CDN no template base.
+- Templates do Django.
+- Tailwind CSS carregado via CDN.
 
-O arquivo `requirements.txt` contem varias dependencias alem do Django. Para esta aplicacao, o nucleo usado ate aqui e o Django com seus recursos padrao de templates, rotas, arquivos estaticos e views.
+O `requirements.txt` contém dependências adicionais, mas o núcleo utilizado neste estágio da aplicação é o Django e seus recursos nativos de autenticação, sessões, mensagens, templates, rotas e ORM.
 
 ## Estrutura do projeto
 
@@ -28,96 +32,92 @@ O arquivo `requirements.txt` contem varias dependencias alem do Django. Para est
 .
 ├── core/
 │   ├── settings.py
+│   ├── tests.py
 │   ├── urls.py
+│   ├── views.py
 │   ├── asgi.py
 │   └── wsgi.py
 ├── usuarios/
-│   ├── urls.py
-│   ├── views.py
-│   ├── models.py
+│   ├── migrations/
+│   │   └── 0001_initial.py
+│   ├── templates/
+│   │   ├── cadastro.html
+│   │   ├── clientes.html
+│   │   └── login.html
 │   ├── admin.py
 │   ├── apps.py
-│   └── templates/
-│       └── cadastro.html
+│   ├── models.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
 ├── templates/
+│   ├── static/
+│   │   ├── assistente_virtual.png
+│   │   ├── banner.jpg
+│   │   ├── logo.webp
+│   │   └── user.png
 │   ├── base.html
-│   └── static/
-│       ├── assistente_virtual.png
-│       ├── banner.jpg
-│       ├── logo.webp
-│       └── user.png
+│   └── home.html
 ├── manage.py
 ├── requirements.txt
 └── db.sqlite3
 ```
 
+O banco `db.sqlite3`, o ambiente virtual e o arquivo `.env` são locais e permanecem ignorados pelo Git.
+
 ## Rotas
 
-| Caminho | Origem | Descricao |
+| Caminho | Nome da rota | Descrição |
 | --- | --- | --- |
-| `/admin/` | `core.urls` | Painel administrativo padrao do Django. |
-| `/usuarios/cadastro/` | `usuarios.urls` | Tela e envio do formulario de cadastro. |
+| `/` | `home` | Página inicial institucional. |
+| `/admin/` | `admin` | Painel administrativo do Django. |
+| `/usuarios/cadastro/` | `cadastro` | Exibição e processamento do cadastro de usuário. |
+| `/usuarios/login/` | `login` | Exibição e processamento da autenticação. |
+| `/usuarios/clientes/` | `clientes` | Listagem e cadastro de clientes do usuário atual. |
 
-## Funcionalidades implementadas
+## Fluxos principais
 
-### Cadastro de usuario
+### Cadastro de usuário
 
-A view `usuarios.views.cadastro` trata dois fluxos:
+A view `usuarios.views.cadastro` aceita:
 
-- `GET`: renderiza o template `cadastro.html`.
-- `POST`: le dados enviados pelo formulario e retorna uma resposta HTTP de sucesso.
+- `GET`: renderiza `cadastro.html`.
+- `POST`: compara senha e confirmação, exige pelo menos oito caracteres, impede username duplicado e cria o usuário com `User.objects.create_user`.
 
-No estado atual, o cadastro ainda nao salva dados no banco. A view possui comentario indicando que a logica de persistencia ainda deve ser adicionada.
+Após um cadastro válido, o usuário é direcionado ao login. Falhas de validação retornam ao cadastro com uma mensagem explicativa.
 
-### Interface de cadastro
+### Login
 
-A tela de cadastro inclui:
+A view `usuarios.views.login` autentica username e senha usando o backend padrão do Django. Credenciais válidas criam a sessão e direcionam para a área de clientes; credenciais inválidas retornam ao login com uma mensagem de erro.
 
-- Logo da aplicacao.
-- Campo `username`.
-- Campo de senha.
-- Campo de confirmacao de senha.
-- Botao de envio.
-- Link visual para usuarios que ja possuem conta.
-- Botoes visuais de continuidade com Google e GitHub.
-- Banner lateral exibido em telas grandes.
+### Gestão de clientes
 
-### Templates e arquivos estaticos
+Cada cliente possui:
 
-O template base carrega Tailwind CSS via CDN e expoe blocos Django para `head` e `body`.
+- nome;
+- e-mail único;
+- tipo `PF` ou `PJ`;
+- status ativo ou inativo;
+- vínculo com um usuário do Django.
 
-Os arquivos estaticos estao configurados por `STATICFILES_DIRS` apontando para `templates/static`, com `STATIC_ROOT` em `staticfiles`. Tambem ha configuracao de media:
-
-- `MEDIA_ROOT = BASE_DIR / "media"`
-- `MEDIA_URL = "/media/"`
-
-## Configuracoes relevantes
-
-- `LANGUAGE_CODE = "pt-br"`
-- `TIME_ZONE = "UTC"`
-- `DEBUG = True`
-- `ALLOWED_HOSTS = []`
-- Banco padrao: SQLite em `db.sqlite3`
-- Templates globais: `BASE_DIR / "templates"`
-
-Estas configuracoes estao adequadas para desenvolvimento local. Antes de publicar a aplicacao, revise `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, arquivos estaticos e configuracoes de banco.
+A consulta da tela usa `Cliente.objects.filter(user=request.user)`, restringindo a listagem aos registros associados ao usuário atual. O formulário modal cria novos registros e associa automaticamente o usuário da sessão.
 
 ## Como executar localmente
 
 1. Crie e ative um ambiente virtual:
 
 ```bash
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate
 ```
 
-2. Instale as dependencias:
+2. Instale as dependências:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Aplique migracoes:
+3. Aplique as migrações:
 
 ```bash
 python manage.py migrate
@@ -129,25 +129,51 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-5. Acesse:
+5. Acesse `http://127.0.0.1:8000/`.
 
-```text
-http://127.0.0.1:8000/usuarios/cadastro/
+Para utilizar o Django Admin, crie antes um superusuário:
+
+```bash
+python manage.py createsuperuser
 ```
 
-## Pontos de atencao
+## Validação
 
-- O app `usuarios` ainda nao possui modelos definidos.
-- O formulario usa os campos `username`, `senha` e `confirmar_senha`, mas a view atualmente tenta ler `password`; isso precisa ser alinhado quando a persistencia for implementada.
-- Os botoes de Google e GitHub sao apenas elementos visuais e ainda nao possuem autenticacao social configurada.
-- Ainda nao existem testes automatizados implementados.
-- O projeto nao esta com Git inicializado neste diretorio, entao este README foi criado a partir da leitura do estado atual dos arquivos.
+Execute as verificações do Django e a suíte automatizada:
 
-## Proximos passos sugeridos
+```bash
+python manage.py check
+python manage.py test
+python manage.py makemigrations --check --dry-run
+```
 
-- Criar a persistencia de usuarios usando o sistema de autenticacao do Django.
-- Validar senha e confirmacao de senha.
-- Exibir mensagens de erro e sucesso no template.
-- Implementar login/logout.
-- Adicionar testes para a view de cadastro.
-- Separar configuracoes sensiveis em variaveis de ambiente.
+A suíte atual contém dois testes para a home: disponibilidade da página e presença do link de cadastro.
+
+## Configurações relevantes
+
+- `LANGUAGE_CODE = "pt-br"`.
+- `TIME_ZONE = "UTC"`.
+- Templates globais em `BASE_DIR / "templates"`.
+- Arquivos estáticos de origem em `templates/static`.
+- Banco padrão SQLite em `db.sqlite3`.
+- `DEBUG = True` e `ALLOWED_HOSTS = []`, adequados somente ao desenvolvimento local.
+
+Antes de publicar a aplicação, mova a `SECRET_KEY` para uma variável de ambiente e revise `DEBUG`, `ALLOWED_HOSTS`, banco de dados, HTTPS e a entrega dos arquivos estáticos.
+
+## Limitações conhecidas
+
+- A rota `/usuarios/clientes/` ainda não aplica `login_required`; acessos anônimos diretos podem resultar em erro.
+- Os cards de totais, a busca e o filtro da tela de clientes ainda são demonstrativos.
+- A unicidade do e-mail de cliente é global, não por usuário.
+- Ainda não existe fluxo de logout.
+- Autenticação social não foi implementada.
+- Cadastro, login e gestão de clientes ainda não possuem testes automatizados específicos.
+
+## Próximos passos sugeridos
+
+- Proteger a área de clientes e definir redirecionamentos para usuários anônimos.
+- Implementar logout.
+- Calcular indicadores e implementar busca e filtros de clientes.
+- Ampliar os testes dos fluxos de autenticação e clientes.
+- Validar os dados de cliente com formulários Django e tratar e-mails duplicados.
+- Externalizar configurações sensíveis para variáveis de ambiente.
