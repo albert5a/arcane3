@@ -6,6 +6,7 @@ from django.contrib import messages, auth
 from django.contrib.auth import authenticate
 from django.urls import reverse
 from .models import Cliente, Documentos
+from ia.agents import JuriAI
 
 
 def cadastro(request):

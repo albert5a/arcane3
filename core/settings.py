@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'usuarios',
     'martor',
-    'ia'
+    'ia',
+    'django_q',
 ]
 
 MIDDLEWARE = [
@@ -132,4 +133,13 @@ from django.contrib.messages import constants
 MESSAGE_TAGS = {
     constants.SUCCESS: 'bg-green-50 text-green-700',
     constants.ERROR: 'bg-red-50 text-red-700'
+}
+
+Q_CLUSTER = {
+    "name": "juriAi",
+    "workers": 1,
+    "retry": 200,        
+    "timeout": 180,       
+    "queue_limit": 50,
+    "orm": "default",
 }
